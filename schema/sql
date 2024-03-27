@@ -1,0 +1,70 @@
+CREATE DATABASE care_home_manager;
+
+USE care_home_manager;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    fullname VARCHAR(255) NOT NULL,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role INT DEFAULT 0,
+    status ENUM('pending', 'approve') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE residents (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    birthday DATE NOT NULL,
+    room_number INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS resident_data (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    resident_id INT NOT NULL,
+    personal_care JSON,
+    personal_care_hygiene JSON,
+    food_intake JSON,
+    fluid_intake JSON,
+    weight JSON,
+    oxygen_saturation JSON,
+    pulse_rate JSON,
+    temperature JSON,
+    blood_sugar_level JSON,
+    bowel_movement JSON,
+    body_map JSON,
+    incident_accident_form JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (resident_id) REFERENCES residents(id),
+    INDEX (resident_id),  
+    INDEX (created_at)    
+);
+
+
+CREATE TABLE resident_care_plan (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    resident_id INT,
+    name VARCHAR(255),
+    birthday DATE,
+    room_number INT,
+    care_instructions TEXT,
+    medication_schedule TEXT,
+    age TEXT,
+    medical_history TEXT,
+    allergies TEXT,
+    medications TEXT,
+    key_contacts TEXT,
+    support TEXT,
+    behavior TEXT,
+    personal_care TEXT,
+    mobility TEXT,
+    sleep TEXT,
+    nutrition TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_by VARCHAR(255),
+    FOREIGN KEY (resident_id) REFERENCES residents(id) ON DELETE CASCADE
+);
+

@@ -1,0 +1,234 @@
+Hi you have to response me as a good senior nodejs and sql developer .
+i have to create an api that can update the data from the existing table the tables or rows can also be empty if any id coming from the user then it will update otherwise it will remain the same as it is befor e. i have a code but its not working fine as i update the values and if any value is miss it can make it nullable even befor user save the data in it . so you have to handle that issue and modify and optimize this route code 
+here is the code
+export const editResident = async (req, res) => {
+
+    try {
+
+        const { residentId } = req.params
+
+        const {
+
+            name,
+
+            birthday,
+
+            roomNumber,
+
+            care_instructions,
+
+            medication_schedule,
+
+            age,
+
+            medical_history,
+
+            allergies,
+
+            medications,
+
+            key_contacts,
+
+            support,
+
+            behavior,
+
+            personal_care,
+
+            mobility,
+
+            sleep,
+
+            nutrition,
+
+        } = req.body
+
+        const [user] = await db.execute("SELECT * FROM users WHERE id = ?", [
+
+            req.user._id,
+
+        ])
+
+        console.log(user)
+
+        const [resident] = await db.execute(
+
+            "SELECT * FROM resident_care_plan WHERE resident_id = ?",
+
+            [residentId]
+
+        )
+
+
+
+        console.log(resident[0])
+
+        // Replace undefined values with null
+
+        const nullableName = name !== undefined ? name : resident[0].name
+
+        const nullableBirthday =
+
+            birthday !== undefined ? birthday : resident[0].birthday
+
+        const nullableRoomNumber =
+
+            roomNumber !== undefined ? roomNumber : resident[0].room_number
+
+        const nullableCareInstructions =
+
+            care_instructions !== undefined ? care_instructions : null
+
+        const nullableMedicationSchedule =
+
+            medication_schedule !== undefined ? medication_schedule : null
+
+        const nullableAge = age !== undefined ? age : null
+
+        const nullableMedicalHistory =
+
+            medical_history !== undefined ? medical_history : null
+
+        const nullableAllergies = allergies !== undefined ? allergies : null
+
+        const nullableMedications = medications !== undefined ? medications : null
+
+        const nullableKeyContacts = key_contacts !== undefined ? key_contacts : null
+
+        const nullableSupport = support !== undefined ? support : null
+
+        const nullableBehavior = behavior !== undefined ? behavior : null
+
+        const nullablePersonalCare =
+
+            personal_care !== undefined ? personal_care : null
+
+        const nullableMobility = mobility !== undefined ? mobility : null
+
+        const nullableSleep = sleep !== undefined ? sleep : null
+
+        const nullableNutrition = nutrition !== undefined ? nutrition : null
+
+
+
+        // Update resident care plan and details in the database
+
+        const [updated_resident] = await db.execute(
+
+            `
+
+                UPDATE resident_care_plan 
+
+                SET 
+
+                    name = ?, 
+
+                    birthday = ?, 
+
+                    room_number = ?,
+
+                    care_instructions = ?, 
+
+                    medication_schedule = ?, 
+
+                    age = ?, 
+
+                    medical_history = ?, 
+
+                    allergies = ?, 
+
+                    medications = ?, 
+
+                    key_contacts = ?, 
+
+                    support = ?, 
+
+                    behavior = ?, 
+
+                    personal_care = ?, 
+
+                    mobility = ?, 
+
+                    sleep = ?, 
+
+                    nutrition = ? ,
+
+                    updated_by = ?
+
+                WHERE resident_id = ?
+
+            `,
+
+            [
+
+                nullableName,
+
+                nullableBirthday,
+
+                nullableRoomNumber,
+
+                nullableCareInstructions,
+
+                nullableMedicationSchedule,
+
+                nullableAge,
+
+                nullableMedicalHistory,
+
+                nullableAllergies,
+
+                nullableMedications,
+
+                nullableKeyContacts,
+
+                nullableSupport,
+
+                nullableBehavior,
+
+                nullablePersonalCare,
+
+                nullableMobility,
+
+                nullableSleep,
+
+                nullableNutrition,
+
+                user[0].username,
+
+                residentId,
+
+            ]
+
+        )
+
+
+
+        await db.execute(
+
+            "UPDATE residents SET name = ?, birthday = ?, room_number = ? WHERE id = ?",
+
+            [nullableName, nullableBirthday, nullableRoomNumber, residentId]
+
+        )
+
+        const [carePlan] = await db.execute(
+
+            "SELECT * FROM resident_care_plan WHERE resident_id = ?",
+
+            [residentId]
+
+        )
+
+        // Return success message
+
+        res.status(200).json({ carePlan: carePlan[0] })
+
+    } catch (error) {
+
+        console.error(error)
+
+        res.status(500).json({ message: "Internal Server Error" })
+
+    }
+
+}
